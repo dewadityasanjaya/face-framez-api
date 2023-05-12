@@ -1,5 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+const knex = require('knex')
+
+// Database Initialization
+const db = knex({
+    client: 'pg',
+    connection: {
+        host: '127.0.0.1',
+        user: 'hyokito',
+        port: 5432,
+        password: '',
+        database: 'face-framez'
+    }
+});
 
 const app = express();
 
@@ -41,15 +54,17 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
-    database.users.push({
-        id: '125',
-        name: name,
-        email: email,
-        password: password,
-        entries: 0,
-        joined: new Date()
-    });
-    res.json(database.users.slice(-1)[0]);
+    db('users')
+        .returning('*')
+        .insert({
+            name: name,
+            email: email,
+            joined: new Date()
+        })
+        .then(response => {
+            res.json(response[0]);
+        })
+        .catch(err => res.status(400).json(err))
 })
 
 app.get('/profile/:id', (req, res) => {
