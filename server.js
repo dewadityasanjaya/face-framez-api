@@ -21,11 +21,15 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 
+// --- ENDPOINT --- //
+
+// GET ALL USER DATA
 app.get('/', (req, res) => {
     db.select('*').from('users')
         .then(data => res.json(data));
 });
 
+// POST USER SIGN IN
 app.post('/signin', (req, res) => {
     const { email, password } = req.body;
     db.select('email', 'hash').from('login')
@@ -46,6 +50,7 @@ app.post('/signin', (req, res) => {
         .catch(err => res.status(400).json('wrong credentials'))
 });
 
+// POST USER REGISTER
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
     const salt = bcrypt.genSaltSync(saltRounds);
@@ -75,6 +80,7 @@ app.post('/register', (req, res) => {
         .catch(err => res.status(400).json('unable to register'))
 })
 
+// GET USER PROFILE
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
     db.select('*').from('users').where({ id })
@@ -88,6 +94,7 @@ app.get('/profile/:id', (req, res) => {
         .catch(err => res.status(400).json('error getting user'))
 })
 
+// PUT UPDATE ENTRIES COUNT
 app.put('/image', (req, res) => {
     const { id } = req.body;
     db('users').where('id', '=', id)
@@ -99,6 +106,7 @@ app.put('/image', (req, res) => {
         .catch(err => res.status(400).json('unable to get entries'))
 })
 
+// APP LISTENER
 app.listen(3000, () => {
     console.log("Port 3000 is working!");
 });
